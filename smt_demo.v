@@ -61,6 +61,7 @@ Proof.
 Require Import Coq.Logic.Classical_Prop.
 
 Definition marker(P: Prop): Prop := P.
+Definition marker2(P: Prop): Prop := P.
 
 Lemma E: forall A (P: A -> Prop), (exists a: A, ~ P a) <-> ~ forall (a: A), P a.
 Proof.                                                                                
@@ -109,7 +110,10 @@ Ltac negate_goal :=
   match goal with
   | |- ~ ?P => let r := countZ P in repeatN r ltac:(setoid_rewrite <- E)
   end;
-  setoid_rewrite K.
+  setoid_rewrite K;
+  match goal with
+  | |- ?P => change (marker2 P)
+  end.
 
 Set Printing Depth 10000.
 
@@ -138,13 +142,14 @@ Notation "'(assert' P ')'" := (marker P)
 Notation "- 0 a" := (Z.opp a) (at level 10, a at level 10).
 Notation "'or' '(not' A ')' B" := (A -> B) (at level 10, A at level 0, B at level 0,
                                             format "or  (not  A )  B").
+Notation "x '(check-sat)'" := (marker2 x) (at level 200, format "x '//' '(check-sat)'").
 
 idtac.
 
 (** END notations *)
 
 
-  (* Then append "(check-sat)" to the goal and feed it into Z3.
+  (* Now feed the goal it into Z3.
      unsat means your goal is true
      sat   means your goal is false *)
 
