@@ -130,6 +130,7 @@ Notation "< A B" := (Z.lt A B) (at level 10, A at level 0, B at level 0).
 Notation "<= A B" := (Z.le A B) (at level 10, A at level 0, B at level 0).
 Notation "- A B" := (Z.sub A B) (at level 10, A at level 0, B at level 0).
 Notation "* A B" := (Z.mul A B) (at level 10, A at level 0, B at level 0, format " *  A  B").
+Notation "^ A B" := (Z.pow A B) (at level 10, A at level 0, B at level 0).
 Notation "= A B" := (@eq Z A B) (at level 10, A at level 0, B at level 0).
 Notation "'not' A" := (not A) (at level 10, A at level 0).
 Notation "'(declare-const' a 'Int)' body" :=
