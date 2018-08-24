@@ -64,7 +64,7 @@ Definition marker(P: Prop): Prop := P.
 Definition marker2(P: Prop): Prop := P.
 
 Lemma E: forall A (P: A -> Prop), (exists a: A, ~ P a) <-> ~ forall (a: A), P a.
-Proof.                                                                                
+Proof.
   intros. split.
   - intros. destruct H as [a H]. intro. apply H. auto.
   - intro. destruct (classic (exists a : A, ~ P a)) as [C | C]; [assumption|].
@@ -74,7 +74,7 @@ Qed.
 
 Lemma K: forall (P Q: Prop), (~ marker (P -> Q)) <-> marker (~ (P -> Q)).
 Proof.
-  cbv [marker]. intros. reflexivity. 
+  cbv [marker]. intros. reflexivity.
 Qed.
 
 Ltac countZ t :=
@@ -141,8 +141,7 @@ Notation "'(assert' P ')'" := (marker P)
                                 (at level 10, P at level 0,
                                  format "(assert  P )").
 Notation "- 0 a" := (Z.opp a) (at level 10, a at level 10).
-Notation "'or' '(not' A ')' B" := (A -> B) (at level 10, A at level 0, B at level 0,
-                                            format "or  (not  A )  B").
+Notation "'implies' A B" := (A -> B) (at level 10, A at level 0, B at level 0).
 Notation "x '(check-sat)'" := (marker2 x) (at level 200, format "x '//' '(check-sat)'").
 
 idtac.
@@ -153,4 +152,3 @@ idtac.
   (* Now feed the goal it into Z3.
      unsat means your goal is true
      sat   means your goal is false *)
-

@@ -28,19 +28,17 @@ Qed.
 (* If we turn this goal into smtlib language using the tactics and notations in smt_demo.v,
    we get the following:
 
-    (declare-const a Int)
-    (declare-const a0 Int)
-    (declare-const a1 Int)
-    (declare-const a2 Int)
-    (declare-const a3 Int)
-    (assert (not (or (not (and (<= 0 a0) (< a0 a)))
-                  (or (not (and (<= 0 a1) (< a1 a))) 
-                   (or (not (and (<= 0 a2) (< a2 a))) 
-                    (or (not (and (<= 0 a3) (< a3 a))) 
-                     (or (not (= (+ ( * a a0) a1)
-                                 (+ ( * a a2) a3))) 
-                         (= a1 a3))))))))
-    (check-sat)
+  (declare-const a Int)
+  (declare-const a0 Int)
+  (declare-const a1 Int)
+  (declare-const a2 Int)
+  (declare-const a3 Int)
+  (assert (not (implies (and (<= 0 a0) (< a0 a))
+                (implies (and (<= 0 a1) (< a1 a))
+                 (implies (and (<= 0 a2) (< a2 a))
+                  (implies (and (<= 0 a3) (< a3 a))
+                   (implies (= (+ ( * a a0) a1) (+ ( * a a2) a3)) (= a1 a3))))))))
+  (check-sat)
 
 but Z3 returns "unknown"
 *)
