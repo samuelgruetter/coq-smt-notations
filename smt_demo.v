@@ -56,18 +56,18 @@ Proof.
   Fail Timeout 10 lia.
   Fail Timeout 10 nia.
 
-(** BEGIN goal negation code *)
+(** BEGIN code to copy paste *)
 
 Require Import Coq.Logic.Classical_Prop.
 
 Definition marker(P: Prop): Prop := P.
 Definition marker2(P: Prop): Prop := P.
 
-Lemma E: forall A (P: A -> Prop), (exists a: A, ~ P a) <-> ~ forall (a: A), P a.
+Lemma EE: forall AA (P: AA -> Prop), (exists a: AA, ~ P a) <-> ~ forall (a: AA), P a.
 Proof.
   intros. split.
   - intros. destruct H as [a H]. intro. apply H. auto.
-  - intro. destruct (classic (exists a : A, ~ P a)) as [C | C]; [assumption|].
+  - intro. destruct (classic (exists a : AA, ~ P a)) as [C | C]; [assumption|].
     exfalso. apply H. intro. destruct (classic (P a)) as [D | D]; [assumption |].
     exfalso. apply C. exists a. assumption.
 Qed.
@@ -77,51 +77,71 @@ Proof.
   cbv [marker]. intros. reflexivity.
 Qed.
 
-Ltac countZ t :=
-  lazymatch t with
-  | forall (x: Z), @?t' x =>
-    let a := eval cbv beta in (t' 0) in
-        let r := countZ a in constr:(S r)
-  | _ => constr:(O)
-  end.
+Definition Func(A B: Type) := A -> B.
 
-Ltac repeatN N f :=
-  match N with
-  | S ?n => f; repeatN n f
-  | O => idtac
-  end.
+(* intro as much as we can *)
+repeat intro.
 
-Ltac negate_goal :=
-  repeat match goal with
-         | H: ?T |- _ => match T with
-                         | Z => fail 1
-                         | _ => revert H
-                         end
+(* clear everything except used vars and Props *)
+repeat match goal with
+       | H: ?T |- _ =>
+         match type of T with
+         | Prop => fail 1
+         | _ => clear H
+         end
+       end.
+
+(* revert all Props *)
+repeat match goal with
+       | H: ?T |- _ =>
+         match type of T with
+         | Prop => revert H
+         end
+       end.
+
+(* protect functions from being treated as implications *)
+repeat match goal with
+       | x: ?T1 -> ?T2 |- _ => change (Func T1 T2) in x
+       end.
+
+(* mark where hyps begin *)
+match goal with
+| |- ?G => change (marker G)
+end.
+
+(* revert vars *)
+repeat match goal with
+       | x: ?T |- _ =>
+         match T with
+         | Type => fail 1
+         | _ => idtac
          end;
-  match goal with
-  | |- ?P => change (marker P)
-  end;
-  repeat match goal with
-         | H: _ |- _ => revert H
-         end;
-  match goal with
-  | |- ?P => assert (~P); [|admit]
-  end;
-  match goal with
-  | |- ~ ?P => let r := countZ P in repeatN r ltac:(setoid_rewrite <- E)
-  end;
-  setoid_rewrite K;
-  match goal with
-  | |- ?P => change (marker2 P)
-  end.
+           revert x
+       end.
+
+(* negate goal *)
+match goal with
+| |- ?P => assert (~P); [|admit]
+end.
+
+(* "not forall" to "exists such that not" *)
+repeat match goal with
+ | |- context[~ (forall (x: ?T), _)] =>
+   (assert (forall (P: T -> Prop), (exists x: T, ~ P x) <-> ~ (forall x: T, P x)) as EEE
+    by apply EE);
+   setoid_rewrite <- EEE;
+   clear EEE
+end.
+
+(* push "not" into marker *)
+setoid_rewrite K.
+
+(* marker for check_sat *)
+match goal with
+| |- ?P => change (marker2 P)
+end.
 
 Set Printing Depth 10000.
-
-negate_goal.
-
-(** END goal negation code *)
-
-(** BEGIN notations *)
 
 Notation "'and' A B" := (Logic.and A B) (at level 10, A at level 0, B at level 0).
 Notation "'or' A B" := (Logic.or A B) (at level 10, A at level 0, B at level 0).
@@ -144,9 +164,10 @@ Notation "- 0 a" := (Z.opp a) (at level 10, a at level 10).
 Notation "'implies' A B" := (A -> B) (at level 10, A at level 0, B at level 0).
 Notation "x '(check-sat)'" := (marker2 x) (at level 200, format "x '//' '(check-sat)'").
 
+(* refresh *)
 idtac.
 
-(** END notations *)
+(** END code to copy paste *)
 
 
   (* Now feed the goal it into Z3.
