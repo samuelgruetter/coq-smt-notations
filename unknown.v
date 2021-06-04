@@ -1,5 +1,4 @@
 Require Import Coq.ZArith.ZArith.
-Require Import Coq.omega.Omega.
 Require Import Coq.micromega.Lia.
 
 Open Scope Z_scope.
@@ -16,12 +15,12 @@ Proof.
   pose proof Z.mod_unique as P.
   specialize P with (b := base) (q := c) (r := d).
   specialize P with (2 := H3).
-  rewrite P by omega.
-  rewrite <- Z.add_mod_idemp_l by omega.
+  rewrite P by lia.
+  rewrite <- Z.add_mod_idemp_l by lia.
   rewrite Z.mul_comm.
-  rewrite Z.mod_mul by omega.
+  rewrite Z.mod_mul by lia.
   rewrite Z.add_0_l.
-  rewrite Z.mod_small by omega.
+  rewrite Z.mod_small by lia.
   reflexivity.
 Qed.
 
