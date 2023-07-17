@@ -1,5 +1,4 @@
 Require Import Coq.ZArith.BinInt.
-Require Import Coq.omega.Omega.
 Require Import Coq.micromega.Lia.
 
 Open Scope Z_scope.
@@ -52,9 +51,12 @@ Lemma test: forall
      /\ rs2 = r15 /\ simm12 = r10 * 32 + r11 - r16 * 4096.
 Proof.
   intros.
-  Fail omega.
+  (*
   Fail Timeout 10 lia.
-  Fail Timeout 10 nia.
+  Here we used to show that lia times out and we that therefore, we need an SMT solver
+  instead. But by now (Coq 8.16), lia solves this goal in 0.5s!
+  *)
+  Succeed Time lia.
 
 (** BEGIN code to copy paste *)
 
@@ -62,6 +64,8 @@ Require Import Coq.Logic.Classical_Prop.
 
 Definition marker(P: Prop): Prop := P.
 Definition marker2(P: Prop): Prop := P.
+
+Set Nested Proofs Allowed.
 
 Lemma EE: forall AA (P: AA -> Prop), (exists a: AA, ~ P a) <-> ~ forall (a: AA), P a.
 Proof.
